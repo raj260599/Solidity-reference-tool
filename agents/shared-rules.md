@@ -39,28 +39,40 @@ After scanning: escalate every finding to its worst exploitable variant (DoS may
 
 ## Do not report
 
-Admin-only functions doing admin things. Standard DeFi tradeoffs (MEV, rounding dust, first-depositor with MINIMUM_LIQUIDITY). Self-harm-only bugs. "Admin can rug" without a concrete mechanism.
+- Pure admin actions with no configuration-induced violation.
+- Standard tradeoffs that the repo's accepted list already names (check accepted.json first).
+- Anything without a proof test. It goes to the notes file, not the candidates.
 
 ## Output
 
-Return findings as structured blocks:
+Write `output/candidates.json`: a JSON array. A candidate may only have
+status "candidate" until the proof loop runs. Every field is required.
 
-FINDINGs have concrete, unguarded, exploitable attack paths. LEADs have real code smells with partial paths — default to LEAD over dropping.
-
-**Every FINDING must have a `proof:` field** — concrete values, traces, or state sequences from the actual code. No proof = LEAD, no exceptions.
-
-**One vulnerability per item.** Same root cause = one item. Different fixes needed = separate items.
-
+```json
+[
+  {
+    "id": "M02-pace",
+    "contract": "HookLeaseController",
+    "function": "_addPending",
+    "bug_class": "mutable-state-at-accrual",
+    "preconditions": [
+      {"kind": "public | config-owner | token-trust | market-move", "realistic": true, "note": "..."}
+    ],
+    "invariant": {"text": "one horizon of rent at the accrual price", "source": "docs/audit-handoff.md:205"},
+    "path": ["caller", "function", "state change", "impact"],
+    "poc_solidity": "<full Foundry test file>",
+    "proof_test": "test_name_attack",
+    "control_test": "test_name_control",
+    "fix_patch": "<unified diff, or empty>",
+    "fix": "one sentence",
+    "assumption_violated": "accepted tag this violates, or empty"
+  }
+]
 ```
-FINDING | contract: Name | function: func | bug_class: kebab-tag | group_key: Contract | function | bug-class
-path: caller → function → state change → impact
-proof: concrete values/trace demonstrating the bug
-description: one sentence
-fix: one-sentence suggestion
 
-LEAD | contract: Name | function: func | bug_class: kebab-tag | group_key: Contract | function | bug-class
-code_smells: what you found
-description: one sentence explaining trail and what remains unverified
-```
-
-The `group_key` enables deduplication: `ContractName | functionName | bug_class`. Agents may add custom fields.
+Rules:
+- Use `[Tool: Feynman]`, `[Tool: Socratic: file:line]` and `[Tool: Inversion: function]` exactly.
+  The old file mixed `[Feynman: <n>]` and `[Tool: ...]`; use only the second form.
+- Do not drop a candidate because its precondition is configuration. Grade the
+  precondition in `preconditions` instead.
+- Every candidate needs `poc_solidity` with an attack test and a control test.

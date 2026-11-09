@@ -1,0 +1,9 @@
+[
+  {"id": "720-sweep",     "contract": "RevertHookActionBase",    "functions": ["_sendLeftoverTokens", "autoCollect"]},
+  {"id": "M02-pace",      "contract": "HookLeaseController",     "functions": ["_addPending", "_settleMinimumRent"]},
+  {"id": "DON1-interest", "contract": "V4Vault",                 "functions": ["_calculateGlobalInterest", "_getBalanceAndReserves"]},
+  {"id": "AMP1-quota",    "contract": "V4Vault",                 "functions": ["_withdraw", "liquidate"]},
+  {"id": "AC1-reactivate","contract": "RevertHookMigrationActions", "functions": ["afterAddLiquidity", "executeAutoCollect"]},
+  {"id": "AL-retry",      "contract": "RevertHookAutoLendActions","functions": ["autoLendWithdraw"]},
+  {"id": "AutoExit-alias","contract": "AutoExit",                "functions": ["execute"]}
+]

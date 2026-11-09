@@ -20,6 +20,8 @@ Other agents cover known patterns, math, state consistency, and economics. You b
 
 ## Output fields
 
+Also apply authority-propagation-agent.md to every forwarded hookData or calldata.
+
 Add to FINDINGs:
 ```
 guard_gap: the guard that's missing — show the parallel function that has it
